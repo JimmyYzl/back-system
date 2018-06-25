@@ -95,8 +95,13 @@ export default {
 				Api.login({username: this.username, password: this.password}, (data) => {
 					if(data.data.status == "ok") {
             localStorage.setItem('blog_user',data.data.username);
-            localStorage.setItem('blog_token',data.data.token);  
-            this.$router.push('/blogList');
+            localStorage.setItem('blog_token',data.data.token);
+            if(this.$route.query.edit == 1){
+              var data = JSON.parse(localStorage.getItem('pagedata'));
+              this.$router.push({path: '/blogList/articleEdit', query: {edit: true}});
+            } else {
+              this.$router.push('/blogList');
+            }
 					} else {
 						this.$message.error(data.data.code);
 					}

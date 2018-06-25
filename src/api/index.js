@@ -24,7 +24,8 @@ api.addArticle = (data, cd ,ecd) => {
     })
    .then(cd)
    .catch((err) => {
-    window.location.hash = '#/login'; 
+    localStorage.setItem('pagedata',  JSON.stringify(data));
+    window.location.hash = '#/login?edit=1'; 
    });
  } else {
    window.location.hash = '#/login';
@@ -128,6 +129,7 @@ api.uploadimg = (data, cd, ecd) => {
       headers: { 'Content-Type': 'multipart/form-data', "Authorization": "Bearer " + localStorage.getItem('blog_token')},
     })
     .then(cd)
+    .catch(ecd)
   }else{
     window.location.hash = '#/login';
   }

@@ -109,19 +109,24 @@
     },
     
     created () {
-      if(this.$route.query.id) {
-        this.id = this.$route.query.id;
-        Api.getArticle({id: this.$route.query.id}, (data) => {
-          var item = data.data.data;
-          this.item = {
-            image: item.image,
-            title: item.title,
-            tags: item.tags,
-            isshow: item.isshow,
-            description: item.description,
-            article: item.article
-          }
-        })
+      if(this.$route.query.edit){
+        this.item = JSON.parse(localStorage.getItem('pagedata'));
+        localStorage.removeItem('pagedata');
+      } else {
+        if(this.$route.query.id) {
+          this.id = this.$route.query.id;
+          Api.getArticle({id: this.$route.query.id}, (data) => {
+            var item = data.data.data;
+            this.item = {
+              image: item.image,
+              title: item.title,
+              tags: item.tags,
+              isshow: item.isshow,
+              description: item.description,
+              article: item.article
+            }
+          })
+        }
       }
       Api.getTags({},(data) => {
         this.options = data.data.data;
@@ -150,7 +155,8 @@
       
       imgErrorFn (e) {
         if(e.code == "token错误" || e.code == "token过期") {
-          this.$router.push('/login');
+          localStorage.setItem("pagedata", JSON.stringify(this.item));
+          this.$router.push({path: '/login', query: {"edit": 1}});
         }
       },
 
@@ -160,20 +166,27 @@
         formdata.append('file', $file);
         Api.uploadimg(formdata,(data) => {
           this.$refs.md.$img2Url(pos, data.data.url);
+        },(er) => {
+          localStorage.setItem("pagedata", JSON.stringify(this.item));
+          this.$router.push({path: '/login', query: {"edit": 1}});
         })
       },
       
       saveFn () {
         this.loadingSave = true;
+        localStorage.setItem(this.id, this.item);
         var data = this.item;
         data.date = (new Date).getTime();
         if(this.id){
           data.id = this.id;
         }
         Api.addArticle(data, (data) => {
-          this.loadingSave = false;
           if(data.data.status == "ok") {
             this.$message.success('保存成功');
+            this.loadingSave = false;
+            if(this.$route.query.edit){
+              this.$router.push({path: '/blogList/articleEdit', query: {id: data.data.id}});
+            }
           } else {
              this.$message.error(data.data.code);
           }
