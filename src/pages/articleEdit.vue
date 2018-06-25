@@ -61,7 +61,7 @@
 			return {
         id: null,
 				item: {
-					image: "http://oxnqkx7p0.bkt.clouddn.com/IMG_20170604_095404.jpg",
+					image: "",
 					title: null,
 					tags: [],
 					isshow: true,
